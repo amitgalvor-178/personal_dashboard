@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snitch Ad Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:      #f7f6f2;
+    --bg2:     #ffffff;
+    --bg3:     #efeeed;
+    --border:  rgba(0,0,0,0.07);
+    --border2: rgba(0,0,0,0.12);
+    --text:    #18181b;
+    --muted:   #71717a;
+    --muted2:  #a1a1aa;
+    --accent:  #d94512;
+    --accent2: #f0a500;
+    --green:   #059669;
+    --yellow:  #c08000;
+    --red:     #e11d48;
+    --blue:    #2563eb;
+    --card-radius: 14px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 40px 48px 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .logo-area h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(26px, 4vw, 42px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .logo-area h1 span { color: var(--accent); }
+
+  .logo-area p {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 6px;
+  }
+
+  .header-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-align: right;
+    padding-bottom: 4px;
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 28px 48px 0;
+  }
+
+  .stat-cell {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    transition: box-shadow 0.2s;
+  }
+
+  .stat-cell:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--text);
+  }
+
+  .stat-sub { font-size: 11px; color: var(--muted2); margin-top: 1px; }
+
+  .stat-cell.green  .stat-value { color: var(--green); }
+  .stat-cell.yellow .stat-value { color: var(--yellow); }
+  .stat-cell.red    .stat-value { color: var(--red); }
+  .stat-cell.accent .stat-value { color: var(--accent); }
+
+  /* ── INSIGHTS SECTION ── */
+  .insights-section {
+    margin: 24px 48px 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .section-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .insight-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .insight-dim-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .insight-rows { display: flex; flex-direction: column; gap: 7px; }
+
+  .insight-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .insight-row-inner { display: flex; flex-direction: column; gap: 3px; }
+
+  .insight-key {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+
+  .insight-bar-wrap {
+    height: 3px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .insight-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 2px;
+    transition: width 0.8s ease;
+  }
+
+  .insight-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .insight-count {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--muted2);
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-section {
+    padding: 20px 48px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 2px;
+  }
+
+  select {
+    appearance: none;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    padding: 7px 28px 7px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2371717a'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 9px center;
+  }
+
+  select:hover  { border-color: var(--muted); }
+  select:focus  { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(217,69,18,0.1); }
+
+  .filter-sep { width: 1px; height: 24px; background: var(--border2); margin: 0 2px; }
+
+  .results-count {
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .results-count span { color: var(--text); font-weight: 500; }
+
+  /* ── GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    padding: 20px 48px 60px;
+  }
+
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } .insights-grid { grid-template-columns: repeat(2,1fr); } }
+  @media (max-width: 680px)  {
+    .grid { grid-template-columns: 1fr; padding: 16px 20px 48px; }
+    .stats-bar { grid-template-columns: repeat(2,1fr); margin: 20px 20px 0; }
+    .insights-section, .filter-section { padding-left: 20px; padding-right: 20px; margin-left: 0; margin-right: 0; }
+    header { padding: 28px 20px 0; }
+    .insights-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    animation: fadeUp 0.35s ease both;
+  }
+
+  .card:hover {
+    border-color: rgba(0,0,0,0.14);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card:nth-child(1)  { animation-delay: 0.03s; }
+  .card:nth-child(2)  { animation-delay: 0.06s; }
+  .card:nth-child(3)  { animation-delay: 0.09s; }
+  .card:nth-child(4)  { animation-delay: 0.12s; }
+  .card:nth-child(5)  { animation-delay: 0.15s; }
+  .card:nth-child(6)  { animation-delay: 0.18s; }
+  .card:nth-child(7)  { animation-delay: 0.21s; }
+  .card:nth-child(8)  { animation-delay: 0.24s; }
+  .card:nth-child(9)  { animation-delay: 0.27s; }
+
+  /* ── CARD HEADER ── */
+  .card-head {
+    padding: 16px 18px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .score-ring { flex-shrink: 0; position: relative; width: 52px; height: 52px; }
+  .score-ring svg { transform: rotate(-90deg); width: 52px; height: 52px; }
+  .score-ring .track { fill: none; stroke: rgba(0,0,0,0.07); stroke-width: 3.5; }
+  .score-ring .fill  { fill: none; stroke-width: 3.5; stroke-linecap: round; }
+
+  .score-ring .label {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+
+  .score-ring .label .num {
+    font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; line-height: 1;
+  }
+  .score-ring .label .pct {
+    font-family: 'DM Mono', monospace; font-size: 8px; color: var(--muted2); line-height: 1; margin-top: 1px;
+  }
+
+  .card-meta { flex: 1; min-width: 0; }
+
+  .card-id {
+    font-family: 'DM Mono', monospace; font-size: 9.5px; color: var(--muted);
+    letter-spacing: 0.04em; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    display: block;
+  }
+  .card-id:hover { color: var(--accent); }
+
+  .card-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
+
+  .badge {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 2px 7px; border-radius: 4px; font-weight: 500;
+  }
+
+  .badge-dur  { background: rgba(37,99,235,0.08); color: var(--blue); border: 1px solid rgba(37,99,235,0.15); }
+  .badge-err  { background: rgba(225,29,72,0.07); color: var(--red); border: 1px solid rgba(225,29,72,0.15); }
+  .badge-conf { background: rgba(5,150,105,0.07); color: var(--green); border: 1px solid rgba(5,150,105,0.15); }
+
+  .card-dates {
+    font-family: 'DM Mono', monospace; font-size: 9px; color: var(--muted2); line-height: 1.5;
+  }
+
+  /* ── AD COPY ── */
+  .card-copy { padding: 12px 18px; border-bottom: 1px solid var(--border); }
+
+  .copy-text {
+    font-size: 12px; color: var(--muted); line-height: 1.55;
+    overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+  }
+  .copy-text.expanded { display: block; -webkit-line-clamp: unset; }
+
+  .copy-toggle {
+    background: none; border: none; color: var(--accent);
+    font-family: 'DM Mono', monospace; font-size: 10px; cursor: pointer;
+    padding: 4px 0 0; transition: opacity 0.2s;
+  }
+  .copy-toggle:hover { opacity: 0.7; }
+
+  /* ── FB LINK ── */
+  .card-link {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 18px; border-bottom: 1px solid var(--border);
+    text-decoration: none; color: var(--muted);
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.04em;
+    transition: background 0.15s, color 0.15s;
+  }
+  .card-link:hover { background: var(--bg3); color: var(--text); }
+
+  /* ── ANALYSIS TOGGLE ── */
+  .analysis-toggle {
+    width: 100%; background: none; border: none;
+    padding: 10px 18px; display: flex; align-items: center;
+    justify-content: space-between; cursor: pointer;
+    color: var(--muted); font-family: 'DM Mono', monospace;
+    font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+    transition: background 0.15s, color 0.15s;
+  }
+  .analysis-toggle:hover { background: var(--bg3); color: var(--text); }
+  .analysis-toggle .arrow { transition: transform 0.25s; }
+  .analysis-toggle.open .arrow { transform: rotate(180deg); }
+
+  .analysis-body {
+    display: none; padding: 0 18px 14px;
+    flex-direction: column; gap: 10px;
+    animation: slideIn 0.2s ease;
+  }
+  .analysis-body.open { display: flex; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .analysis-group { display: flex; flex-direction: column; gap: 5px; }
+
+  .analysis-group-label {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--muted2); padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  .chip {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    padding: 2px 8px; border-radius: 5px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--muted); letter-spacing: 0.02em; line-height: 1.5;
+  }
+
+  .chip.highlight {
+    background: rgba(217,69,18,0.06); border-color: rgba(217,69,18,0.18);
+    color: var(--accent);
+  }
+
+  .color-swatch-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+  .color-swatch {
+    width: 16px; height: 16px; border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.1); flex-shrink: 0;
+  }
+
+  .color-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); }
+
+  .description-text {
+    font-size: 11px; color: var(--muted); line-height: 1.55; font-style: italic;
+    padding: 6px 10px; border-left: 2px solid var(--border2);
+    background: var(--bg3); border-radius: 0 5px 5px 0;
+  }
+
+  .bool-true  { color: var(--green) !important; }
+  .bool-false { color: var(--muted2) !important; }
+
+  /* ── ERROR STATE ── */
+  .error-box {
+    padding: 12px 18px;
+    background: rgba(225,29,72,0.03);
+    border-top: 1px solid rgba(225,29,72,0.08);
+  }
+  .error-box p {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    color: rgba(225,29,72,0.65); line-height: 1.5;
+  }
+
+  /* ── NO RESULTS ── */
+  .no-results {
+    grid-column: 1/-1; text-align: center; padding: 80px 24px;
+    color: var(--muted); font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 600;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <h1>Snitch <span>Ad</span> Intelligence</h1>
+    <p>Facebook Ads · Performance Analysis Dashboard</p>
+  </div>
+  <div class="header-meta" id="headerDate"></div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-cell">
+    <div class="stat-label">Total Ads</div>
+    <div class="stat-value" id="stat-total">—</div>
+    <div class="stat-sub">in dataset</div>
+  </div>
+  <div class="stat-cell green">
+    <div class="stat-label">Analysed Ads</div>
+    <div class="stat-value" id="stat-avg">—</div>
+    <div class="stat-sub">with creative data</div>
+  </div>
+  <div class="stat-cell yellow">
+    <div class="stat-label">Median Duration</div>
+    <div class="stat-value" id="stat-dur">—</div>
+    <div class="stat-sub">days active (p50)</div>
+  </div>
+  <div class="stat-cell red">
+    <div class="stat-label">Analysis Errors</div>
+    <div class="stat-value" id="stat-err">—</div>
+    <div class="stat-sub">no creative data</div>
+  </div>
+</div>
+
+<!-- ── ATTRIBUTE INSIGHTS ── -->
+<div class="insights-section">
+  <div class="section-header">
+    <span class="section-title">Attribute Insights</span>
+    <span class="section-sub">Median active duration by attribute — longer = more durable creative</span>
+  </div>
+  <div class="insights-grid" id="insightsGrid"></div>
+</div>
+
+<div class="filter-section">
+  <span class="filter-label">Filter</span>
+  <select id="fHookType">
+    <option value="">Hook Type</option>
+    <option>visual</option>
+    <option>both</option>
+    <option>text</option>
+  </select>
+  <select id="fStyleType">
+    <option value="">Person Style</option>
+    <option>influencer</option>
+    <option>ugc_authentic</option>
+    <option>model_aspirational</option>
+  </select>
+  <select id="fFormat">
+    <option value="">Format</option>
+    <option>mixed</option>
+    <option>product_showcase</option>
+    <option>b_roll_lifestyle</option>
+    <option>talking_head</option>
+    <option>storytelling</option>
+  </select>
+  <select id="fError">
+    <option value="">Show All</option>
+    <option value="ok">Analysed Only</option>
+    <option value="err">Errors Only</option>
+  </select>
+  <div class="filter-sep"></div>
+  <span class="filter-label">Sort</span>
+  <select id="fSort">
+    <option value="score_desc">Score ↓</option>
+    <option value="score_asc">Score ↑</option>
+    <option value="dur_desc">Duration ↓</option>
+    <option value="dur_asc">Duration ↑</option>
+  </select>
+  <div class="results-count">Showing <span id="countShown">—</span> of <span id="countTotal">—</span></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const ADS = [{"ad_id":"1175343000858976","success_score":1.0,"duration_days":398,"start_date":"2025-03-12","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1175343000858976","ad_copy":"All new Plus Size Collection is now live at Snitch.co.in. Sizes ranging from 3XL to 6XL. Shop now and get flat 15% off today","analysis":{"hook":{"type":"both","style":"bold statement","description":"A man in a retail setting addresses a pain point via text overlays stating 'FOR BIG' and 'IT IS IMPOSSIBLE TO FIND'."},"cta":{"type":"visual","text":"DISCOVER YOUR STYLE","placement":"end","style":"shop now"},"location":{"primary":"indoor_retail","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"30s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["pink","blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"711142768133448","success_score":1.0,"duration_days":398,"start_date":"2025-03-12","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=711142768133448","ad_copy":"All new Plus Size Collection is now live at Snitch.co.in. Sizes ranging from 3XL to 6XL. Shop now and get flat 15% off today","analysis":{"hook":{"type":"both","style":"text overlay","description":"A bold 'SNITCH PLUS' text overlay centered over a bright, clean retail store background showcasing formal menswear."},"cta":{"type":"visual","text":"DISCOVER YOUR STYLE","placement":"end","style":"brand discovery"},"location":{"primary":"indoor_retail","setting_vibe":"clean retail environment"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["white","beige","blue"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"1148670457035317","success_score":0.8928,"duration_days":348,"start_date":"2025-04-28","end_date":"2026-04-11","ad_library_url":"https://www.facebook.com/ads/library/?id=1148670457035317","ad_copy":"All new Plus Size Collection is now live at Snitch.co.in. Sizes ranging from 3XL to 6XL. Shop now and get flat 15% off today","analysis":{"hook":{"type":"both","style":"action reveal","description":"A plus-size man exits a vehicle in front of a branded storefront, paired with a search-bar graphic typing a query about finding perfection."},"cta":{"type":"visual","text":"DISCOVER YOUR STYLE","placement":"end","style":"brand discovery"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"30s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["black","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1151796482927295","success_score":0.8719,"duration_days":330,"start_date":"2025-05-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1151796482927295","ad_copy":"All new Plus Size Collection is now live at Snitch.co.in. Sizes ranging from 3XL to 6XL. Shop now and get flat 15% off today","analysis":{"error":"403 Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: \"SERVICE_DISABLED\"
+domain: \"googleapis.com\"
+metadata {
+  key: \"service\"
+  value: \"generativelanguage.googleapis.com\"
+}
+metadata {
+  key: \"serviceTitle\"
+  value: \"Gemini API\"
+}
+metadata {
+  key: \"containerInfo\"
+  value: \"514569456025\"
+}
+metadata {
+  key: \"consumer\"
+  value: \"projects/514569456025\"
+}
+metadata {
+  key: \"activationUrl\"
+  value: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+, locale: \"en-US\"
+message: \"Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.\"
+, links {
+  description: \"Google developers console API activation\"
+  url: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+]"}},{"ad_id":"719382667618610","success_score":0.7682,"duration_days":275,"start_date":"2025-07-13","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=719382667618610","ad_copy":"Festive vibes unlocked! ✨🛍️
+
+Ugadi shopping made stylish with @snitch_offline
+From trendy fits to festive must-haves,
+Snitch has it all! 🔥💯
+
+#UgadiShopping #hyderabadfashion #telugufashion #Snitchhyderabad #SnitchMen #FestiveStyle #MensFashion #karunjosh","analysis":{"hook":{"type":"both","style":"text overlay","description":"A man walks towards a Snitch retail store with a stylized 'Ugadi' text overlay to establish a festive shopping theme."},"cta":{"type":"visual","text":null,"placement":"end","style":"visit store"},"location":{"primary":"indoor_retail","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["white","mustard"],"format":"mixed"},"confidence":"high"}},{"ad_id":"672028342525780","success_score":0.7286,"duration_days":254,"start_date":"2025-08-03","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=672028342525780","ad_copy":"Stars within ⭐️
+@snitch.co.in 
+.
+.
+.
+.
+.
+.
+.
+@karanaujla @jaskaran_author @dox.____ 
+#trendingreels #explorepage #viralreels #reels #outfit #punjabi #outfitideas #punjabisongs #punjabisongs #foryoupage #instagramreels #punjabimusicvideo #mfgabhru #karanaujla #grwm #stars #superstar","analysis":{"error":"403 Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: \"SERVICE_DISABLED\"
+domain: \"googleapis.com\"
+metadata {
+  key: \"service\"
+  value: \"generativelanguage.googleapis.com\"
+}
+metadata {
+  key: \"serviceTitle\"
+  value: \"Gemini API\"
+}
+metadata {
+  key: \"containerInfo\"
+  value: \"514569456025\"
+}
+metadata {
+  key: \"consumer\"
+  value: \"projects/514569456025\"
+}
+metadata {
+  key: \"activationUrl\"
+  value: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+, locale: \"en-US\"
+message: \"Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.\"
+, links {
+  description: \"Google developers console API activation\"
+  url: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+]"}},{"ad_id":"746141558408251","success_score":0.7192,"duration_days":249,"start_date":"2025-08-08","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=746141558408251","ad_copy":"Style that fits you perfectly🤩!
+Our Snitch Plus Size collection is here, because incredible style knows no size. We believe everyone deserves to look and feel their absolute best.
+Discover a range designed with comfort and confidence in mind, tailored to fit every curve and celebrate your individual style.
+Your perfect fit is waiting. Explore the collection and own your look.","analysis":{"hook":{"type":"visual","style":"action reveal","description":"The video starts with a low-angle shot of a phone being picked up from a retail store floor, creating immediate movement and curiosity."},"cta":{"type":"visual","text":"WEAR WHAT'S NEXT","placement":"end","style":"brand logo and slogan"},"location":{"primary":"indoor_retail","setting_vibe":"modern minimalist retail store"},"person":{"count":"duo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["white","beige"],"format":"mixed"},"confidence":"high"}},{"ad_id":"4161524794122413","success_score":0.7192,"duration_days":249,"start_date":"2025-08-08","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=4161524794122413","ad_copy":"Style that fits you perfectly🤩!
+Our Snitch Plus Size collection is here, because incredible style knows no size. We believe everyone deserves to look and feel their absolute best.
+Discover a range designed with comfort and confidence in mind, tailored to fit every curve and celebrate your individual style.
+Your perfect fit is waiting. Explore the collection and own your look.","analysis":{"hook":{"type":"visual","style":"action reveal","description":"Two men engage in a dynamic, high-energy interaction within a retail store setting to introduce the clothing line."},"cta":{"type":"visual","text":"WEAR WHAT'S NEXT","placement":"end","style":"shop now"},"location":{"primary":"indoor_retail","setting_vibe":"modern minimalist retail"},"person":{"count":"duo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["white","blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"803321808757660","success_score":0.7136,"duration_days":246,"start_date":"2025-08-11","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=803321808757660","ad_copy":"“Confidence tailored. Attitude delivered. #SnitchStyle”
+.
+.
+#Snitch #StreetLuxury #SnitchVibes #SnitchMenswear #StyleDecoded #UrbanGent #BoldInBlack #DenimAndAttitude #SnitchFit #MensStyleGoals","analysis":{"error":"403 Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: \"SERVICE_DISABLED\"
+domain: \"googleapis.com\"
+metadata {
+  key: \"service\"
+  value: \"generativelanguage.googleapis.com\"
+}
+metadata {
+  key: \"serviceTitle\"
+  value: \"Gemini API\"
+}
+metadata {
+  key: \"containerInfo\"
+  value: \"514569456025\"
+}
+metadata {
+  key: \"consumer\"
+  value: \"projects/514569456025\"
+}
+metadata {
+  key: \"activationUrl\"
+  value: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+, locale: \"en-US\"
+message: \"Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.\"
+, links {
+  description: \"Google developers console API activation\"
+  url: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+]"}},{"ad_id":"1111591007597253","success_score":0.7004,"duration_days":239,"start_date":"2025-08-18","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1111591007597253","ad_copy":"Stripes that speak style — keeping it cool in blue.💙
+
+#snitchbestseller #snitchsquad #menswear #fashion #explorepage #mensfashion #ootd","analysis":{"hook":{"type":"both","style":"text overlay","description":"A bold text overlay 'STRIPES SPEAK STYLE' combined with a visual of the model rolling up his sleeves."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"street","setting_vibe":"gritty urban"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["#1d3a5a","#d2b48c"],"format":"b_roll_lifestyle"},"confidence":"high"}},{"ad_id":"590836870633689","success_score":0.7004,"duration_days":239,"start_date":"2025-08-18","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=590836870633689","ad_copy":"Be authentically you, with our all new Snitch Plus Shirts, starting from Rs. 999 Feel confident and stylish in our new collection! 💪👕 Shop Now!","analysis":{"hook":{"type":"both","style":"product close-up","description":"A split-screen presentation featuring a plus-size male model styling a textured shirt alongside an extreme macro shot of the fabric detail."},"cta":{"type":"visual","text":"WEAR WHAT'S NEXT","placement":"end","style":"brand awareness"},"location":{"primary":"indoor_home","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["brown","mauve"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"750352127962338","success_score":0.6985,"duration_days":238,"start_date":"2025-08-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=750352127962338","ad_copy":"Sunday mood: good food, better company, and my Snitch printed shirt stealing the spotlight. 🌸☀️ #FtSnitch 
+
+#FitSnitch #SnitchCreators #SnitchStyle #PrintedShirtVibes #SundayBrunchLook #BrunchAndStyle #WomensFashionInspo #LifestyleBySnitch #SnitchOOTD #PrintedPerfection #WeekendWardrobe #StyleYourSunday #BrunchFitCheck #CreatorStyle #BoldPrintEnergy","analysis":{"hook":{"type":"both","style":"text overlay","description":"Lifestyle scene of a man at a brunch table with a 'Brunch Date' text overlay introducing the brand."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["peach","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"739611312241787","success_score":0.6947,"duration_days":236,"start_date":"2025-08-21","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=739611312241787","ad_copy":"Not impressed last time? Let Snitch surprise you this time – better fits, bold styles, and quality you’ll love.","analysis":{"hook":{"type":"visual","style":"product close-up","description":"Dynamic low-angle close-up of glossy black dress shoes and tailored trousers to establish an immediate fashion aesthetic."},"cta":{"type":"none","text":null,"placement":"none","style":null},"location":{"primary":"indoor_home","setting_vibe":"minimalist studio"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["black","grey"],"format":"mixed"},"confidence":"high"}},{"ad_id":"764759523028731","success_score":0.6325,"duration_days":203,"start_date":"2025-09-23","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=764759523028731","ad_copy":"\"Keeping it cool in shades of blue 💙#BaggyVibes\"
+.
+.
+#snitchsquad #snitch #explorepage #mensfashion #menswear #ootd #fashion #mensstyle #baggyjeans #baggy #explore","analysis":{"error":"403 Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. [reason: \"SERVICE_DISABLED\"
+domain: \"googleapis.com\"
+metadata {
+  key: \"service\"
+  value: \"generativelanguage.googleapis.com\"
+}
+metadata {
+  key: \"serviceTitle\"
+  value: \"Gemini API\"
+}
+metadata {
+  key: \"containerInfo\"
+  value: \"514569456025\"
+}
+metadata {
+  key: \"consumer\"
+  value: \"projects/514569456025\"
+}
+metadata {
+  key: \"activationUrl\"
+  value: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+, locale: \"en-US\"
+message: \"Gemini API has not been used in project 514569456025 before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025 then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.\"
+, links {
+  description: \"Google developers console API activation\"
+  url: \"https://console.developers.google.com/apis/api/generativelanguage.googleapis.com/overview?project=514569456025\"
+}
+]"}},{"ad_id":"25646246221636316","success_score":0.4742,"duration_days":119,"start_date":"2025-12-16","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=25646246221636316","ad_copy":"Backpack designed for your daily grind. 🎒","analysis":{"hook":{"type":"visual","style":"action reveal","description":"A close-up shot showing a laptop being placed into a green utility backpack to demonstrate functional capacity."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"outdoor_urban","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["green","black"],"format":"b_roll_lifestyle"},"confidence":"high"}},{"ad_id":"1219730623451752","success_score":0.4195,"duration_days":90,"start_date":"2026-01-14","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1219730623451752","ad_copy":"The tee you’ll wear on repeat.
+Snitch T-shirts — clean fit, all-day comfort.
+Tap to shop.","analysis":{"hook":{"type":"visual","style":"action reveal","description":"A split-screen visual showcase of a model posing in a striped graphic tee to highlight fit and style."},"cta":{"type":"both","text":"Tap to shop","placement":"end","style":"shop now"},"location":{"primary":"indoor_studio","setting_vibe":"minimalist studio"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["white","green","black"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"910488871655120","success_score":0.4082,"duration_days":84,"start_date":"2026-01-20","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=910488871655120","ad_copy":"An Arabic blend that speaks before you do.
+Deep. Rich. Addictive. ✨
+SNITCH knows how to bottle confidence.
+
+[ Arabic Perfume , Bestseller Fragrances , Men Daily Essentials ]
+
+#arabic #perfume #snitch #bestseller #dailyessential","analysis":{"hook":{"type":"visual","style":"lifestyle scene","description":"A man in a casual red sweatshirt is shown in a warmly lit home environment holding a new perfume bottle."},"cta":{"type":"visual","text":null,"placement":"end","style":"product reveal"},"location":{"primary":"indoor_home","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"calm","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"chill","product_focus":"throughout","dominant_colors":["red","warm beige"],"format":"mixed"},"confidence":"high"}},{"ad_id":"895868929584092","success_score":0.395,"duration_days":77,"start_date":"2026-01-27","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=895868929584092","ad_copy":"A fashion startup built on speed, scale, and inclusivity.
+
+• 60-minute delivery in select cities
+• Same & next-day delivery across India
+• Dedicated plus-size platform
+• Scaled from online-first to 100 stores in 17 months
+• Operating at a ₹1000 Cr ARR
+
+This is not traditional fashion growth.
+This is Snitch.
+#sntich #fashionbrand","analysis":{"hook":{"type":"both","style":"action reveal","description":"A man in a turban performs an everyday action of pouring water while a text overlay introduces a brand story."},"cta":{"type":"visual","text":"₹1000 Crore","placement":"end","style":"authority statement"},"location":{"primary":"indoor_home","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["maroon","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"890553077000653","success_score":0.3913,"duration_days":75,"start_date":"2026-01-29","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=890553077000653","ad_copy":"Get your favourite fits from Snitch at up to 20% OFF because fast fashion is reallyyy selling fast","analysis":{"hook":{"type":"both","style":"text overlay","description":"A creator holds up a pair of tan trousers on a hanger with a bold 'TROUSERS' text overlay to immediately identify the product category."},"cta":{"type":"visual","text":"DISCOVER YOUR STYLE","placement":"end","style":"shop now"},"location":{"primary":"indoor_home","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["beige","blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"3213471725500674","success_score":0.3913,"duration_days":75,"start_date":"2026-01-29","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=3213471725500674","ad_copy":"Get your favourite fits from Snitch at up to 20% OFF because fast fashion is reallyyy selling fast","analysis":{"hook":{"type":"both","style":"lifestyle scene","description":"A sophisticated lifestyle shot of a man in curated menswear reading a newspaper with a bold brand logo overlay."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"outdoor_urban","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["black","grey"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1.72452E+15","success_score":0.3668,"duration_days":62,"start_date":"2026-02-11","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1724521348517840","ad_copy":"Jacket rotation from @snitch.co.in 
+
+Dm for links
+
+#fypppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp #explorepage✨ #aesthetic #reel #outfits","analysis":{"hook":{"type":"visual","style":"text overlay","description":"Large bold text overlay 'JACKET ROTATION FT SNITCH' centered on screen to immediately communicate the video's theme."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_home","setting_vibe":"minimalist studio"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["black","green"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"2268567003554118","success_score":0.3573,"duration_days":57,"start_date":"2026-02-16","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2268567003554118","ad_copy":"Not just style.
+Built for real movement.
+SNITCH Cargos — designed to be used.","analysis":{"hook":{"type":"both","style":"text overlay","description":"A lifestyle shot of a man in a cafe with a bold 'NOT JUST STYLE' text overlay on a pink background."},"cta":{"type":"visual","text":"SNITCH CARGOS","placement":"end","style":"product reveal"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["grey","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1508459924132672","success_score":0.3573,"duration_days":57,"start_date":"2026-02-16","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1508459924132672","ad_copy":"Your one stop destination to transform your style. Head to your nearest Snitch store now and join the revolution!","analysis":{"hook":{"type":"visual","style":"action reveal","description":"A man is shown from behind walking towards the brightly lit Snitch storefront in a mall setting."},"cta":{"type":"none","text":null,"placement":"end","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["black","burgundy"],"format":"b_roll_lifestyle"},"confidence":"high"}},{"ad_id":"2770588586625065","success_score":0.3573,"duration_days":57,"start_date":"2026-02-16","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2770588586625065","ad_copy":"Comment \"CARGO\" for the links! Ft. Best Cargos under 1599 from Snitch!👖
+
+.
+#snitch #cargo #fashion #ootd #menswear","analysis":{"hook":{"type":"both","style":"text overlay, product close-up, bold statement","description":"A visual product reveal of denim cargo pants paired with a bold text overlay highlighting a specific price point under 1599."},"cta":{"type":"both","text":"Comment \"CARGO\" for the links!","placement":"throughout","style":"engagement push"},"location":{"primary":"indoor_retail","setting_vibe":"modern minimalist retail store"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["blue","black","grey"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2189804385160556","success_score":0.3554,"duration_days":56,"start_date":"2026-02-17","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2189804385160556","ad_copy":"Upgrade your wardrobe with unique and trending collections. Check out the amazing quality and fits from Snitch right here. 
+@snitch.co.in
+Come see us and try them on! 
+
+Address📍: The Polaris World, VIP Road, Vesu, Surat, Gujarat - 395007
+
+#snitch #snitchsquad #SnitchVibes #fashionstyle #fashion","analysis":{"hook":{"type":"both","style":"lifestyle scene","description":"A creator stands in front of a physical Snitch retail storefront, gesturing to invite viewers into the shopping experience."},"cta":{"type":"visual","text":null,"placement":"end","style":"shop now"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"unclear","product_focus":"throughout","dominant_colors":["white","blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"4188248784773682","success_score":0.3554,"duration_days":56,"start_date":"2026-02-17","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=4188248784773682","ad_copy":"Fabric Fit Check 👔 @snitch.co.in 
+
+Address 📍: Central Business Hub, Gandevi Road, Navsari, Gujarat - 396445
+
+#fabric #fashion #snitchsquad #snitch #gujrat","analysis":{"hook":{"type":"both","style":"lifestyle scene","description":"A young man stands in front of a modern Snitch storefront, setting the stage for a retail haul or store visit."},"cta":{"type":"visual","text":null,"placement":"end","style":"visit store"},"location":{"primary":"mixed","setting_vibe":"modern retail"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["blue","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1643559303307023","success_score":0.3536,"duration_days":55,"start_date":"2026-02-18","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1643559303307023","ad_copy":"Comment “bootcut” or “link” for links!🧨
+.
+Celebrate this valentine with Snitch
+.
+Best colour combo’s ft snitch.co.in thesnitchsquad 
+1. Navy shirt + grey bootcut = Musculine
+2. Grey shirt + black bootcut = Bold
+#bootcut #denim #ootd #snitch #bellbottom
+.
+[ best jeans for men, best styling tips for men, men styling Pinterest, perfect bootcut denim, perfect bootcut jeans, best bootcut jeans buy online]","analysis":{"hook":{"type":"both","style":"text overlay","description":"The ad opens with a provocative question in Hindi comparing Tinder to real life, using a relatable dating context to immediately grab the viewer's attention."},"cta":{"type":"visual","text":"SNITCH","placement":"end","style":"brand reveal"},"location":{"primary":"outdoor_urban","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["navy","grey"],"format":"mixed"},"confidence":"high"}},{"ad_id":"775754225570314","success_score":0.3517,"duration_days":54,"start_date":"2026-02-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=775754225570314","ad_copy":"Snitch trousers = sharp fit + smooth
+fabric + all-day comfort.
+Meetings ho ya daily hustle - look stays
+refined.
+Comfort that works as hard as you do.
+#SnitchBestSeller #SnitchSquad
+#MensStyle #OfficeWear
+#SmartDressing","analysis":{"hook":{"type":"both","style":"lifestyle scene","description":"A creator speaks directly to the camera in an outdoor campus setting while wearing the featured trousers."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"mixed","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["green","tan"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1460247025440697","success_score":0.3517,"duration_days":54,"start_date":"2026-02-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1460247025440697","ad_copy":"My go to cargo pants💯
+snitch.co.in 
+.
+.
+.
+.
+,
+,
+#snitchcreator #snitch #styling","analysis":{"hook":{"type":"both","style":"text overlay","description":"Close-up action of tying cargo pant drawstrings paired with a bold 'STYLISH' text overlay."},"cta":{"type":"visual","text":"MY GO TO CARGO PANTS","placement":"end","style":"product recommendation"},"location":{"primary":"outdoor_urban","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["olive green","off white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"3363291323837633","success_score":0.3517,"duration_days":54,"start_date":"2026-02-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=3363291323837633","ad_copy":"Tried. Tested. Reordered.
+
+These are Snitch’s top-performing styles — the ones that never miss. Whether it’s brunch, office, or date night, these shirts do the talking.
+
+Start with the best.","analysis":{"hook":{"type":"visual","style":"lifestyle scene","description":"A solo male model in a maroon embroidered shirt poses with a coffee mug against a neutral studio background."},"cta":{"type":"visual","text":"DISCOVER","placement":"end","style":"shop now"},"location":{"primary":"indoor_studio","setting_vibe":"minimalist studio"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"chill","product_focus":"throughout","dominant_colors":["maroon","beige"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"946088717845001","success_score":0.3517,"duration_days":54,"start_date":"2026-02-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=946088717845001","ad_copy":"Snitch plus is now live! Big guys, join the revolution. Switch to snitch now!","analysis":{"hook":{"type":"both","style":"bold statement","description":"A close-up direct address where the presenter leans into the frame with a text overlay to immediately engage the viewer."},"cta":{"type":"visual","text":"SHOP NOW","placement":"end","style":"shop now"},"location":{"primary":"indoor_studio","setting_vibe":"minimalist studio"},"person":{"count":"duo","gender_presentation":"male","age_range":"30s","style_type":"ugc_authentic","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["green","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1215956877321203","success_score":0.346,"duration_days":51,"start_date":"2026-02-22","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1215956877321203","ad_copy":"You only need one pair for every occasion.🥾
+Aero Black Sneakers from Snitch 🖤
+Comment “SNITCH” for the link.
+.
+.
+.
+#snitchbestseller #snitchsquad","analysis":{"hook":{"type":"both","style":"bold statement","description":"A male creator delivers a bold statement directly to the camera claiming that the viewer only needs one pair of shoes for any occasion."},"cta":{"type":"none","text":"Comment “SNITCH” for the link.","placement":"none","style":"comment for link"},"location":{"primary":"indoor_home","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["brown","beige","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1180810357249863","success_score":0.346,"duration_days":51,"start_date":"2026-02-22","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1180810357249863","ad_copy":"Which outfit did you like the most?","analysis":{"hook":{"type":"both","style":"text overlay","description":"A solo male influencer stands in a modern bedroom with a bold 'A DAY' white text overlay, initiating a 'Get Ready With Me' style transition sequence."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["beige","red"],"format":"mixed"},"confidence":"high"}},{"ad_id":"938501642069414","success_score":0.3404,"duration_days":48,"start_date":"2026-02-25","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=938501642069414","ad_copy":"3 denim fits from Snitch under ₹1599 👀 
+Favorite? Mine’s the last one.
+
+#snitch #denimfit #menswearindia #budgetstyle","analysis":{"hook":{"type":"both","style":"text overlay","description":"Bold text overlay '3 jeans' appearing over a well-lit retail store background to immediately signal a product curation."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["beige","blue"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"1483321873356919","success_score":0.3385,"duration_days":47,"start_date":"2026-02-26","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1483321873356919","ad_copy":"The right pair of jeans changes everything.  Snitch jeans are crafted for a sharp fit, all-day comfort, and effortless styling. From laid-back days to dressed-up nights — this is denim that moves with you and makes a statement.  Find your perfect fit.","analysis":{"hook":{"type":"both","style":"bold statement","description":"The video opens with a bold text overlay claiming the product 'changed my life' while showcasing the jeans front-and-center."},"cta":{"type":"visual","text":"DISCOVER YOUR STYLE","placement":"end","style":"shop now"},"location":{"primary":"indoor_home","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["blue","beige"],"format":"mixed"},"confidence":"high"}},{"ad_id":"895082986497685","success_score":0.331,"duration_days":43,"start_date":"2026-03-02","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=895082986497685","ad_copy":"Still wearing basic tees? Level up your everyday fits with premium Snitch t-shirts made for compliments.  Perfect fit. Trendy designs. Unreal comfort. This is not basic. This is Snitch.  Shop now before your size disappears.","analysis":{"hook":{"type":"both","style":"text overlay","description":"A persistent 'POV' text overlay creates an intriguing scenario as a customer approaches a retail checkout counter."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"modern minimalist retail store"},"person":{"count":"duo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["white","orange","green"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1404366320913044","success_score":0.331,"duration_days":43,"start_date":"2026-03-02","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1404366320913044","ad_copy":"Trends change. Your style shouldn’t fall behind.  Snitch shirts bring bold patterns, modern cuts, and effortless styling into one perfect fit. Made for the guy who doesn’t blend in.  Upgrade your rotation.","analysis":{"hook":{"type":"both","style":"action reveal","description":"Model performs a confident walk-on entry in a retail setting with 'FIT CHECK' text overlay."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"modern minimalist retail"},"person":{"count":"group","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["brown","blue","white"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"1781647559462499","success_score":0.331,"duration_days":43,"start_date":"2026-03-02","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1781647559462499","ad_copy":"Meet the shirt that works everywhere — brunch, meetings, date nights.  Snitch combines comfort, structure, and standout details so you never have to think twice about what to wear.  One shirt. Endless moves.","analysis":{"hook":{"type":"both","style":"text overlay","description":"Large graphic overlay reading '#SNITCH FITS' appearing over a man holding a pile of clothing in a boutique setting."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"minimalist studio"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["pink","beige","white"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"4389158671317148","success_score":0.3253,"duration_days":40,"start_date":"2026-03-05","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=4389158671317148","ad_copy":"Which one would you wear first? 👇
+
+@snitch.co.in 
+
+#mensfashion #ootd #lifestyle #mensstyle #grwm","analysis":{"hook":{"type":"both","style":"bold statement","description":"A male influencer holds a bundle of shirts with a bold text overlay challenging the viewer's current wardrobe essentials."},"cta":{"type":"both","text":"Which one would you wear first?","placement":"end","style":"engagement push"},"location":{"primary":"indoor_home","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["white","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2752239191781762","success_score":0.3234,"duration_days":39,"start_date":"2026-03-06","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2752239191781762","ad_copy":"Fit check before style check 
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+[Fit Check , Style Check , Snitch , Shirts , Formal , Casual , Stripes , Purple , men fashion , Mens wear , outfit , Snitch bestseller ]
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+.
+#snitch #mensshirts #lucknow #mensoutfits #snitchsquad","analysis":{"hook":{"type":"both","style":"text overlay","description":"A man performs a mirror-style 'fit check' using a text overlay to contrast outfit preparation with final style."},"cta":{"type":"visual","text":null,"placement":"end","style":"aspirational lifestyle"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["maroon","light blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"4266054356985205","success_score":0.3229,"duration_days":41,"start_date":"2026-03-03","end_date":"2026-04-13","ad_library_url":"https://www.facebook.com/ads/library/?id=4266054356985205","ad_copy":"Meet the shirt that works everywhere — brunch, meetings, date nights.  Snitch combines comfort, structure, and standout details so you never have to think twice about what to wear.  One shirt. Endless moves.","analysis":{"hook":{"type":"both","style":"bold statement","description":"Presenter uses a provocative 'I'M DONE' text overlay and direct eye contact to create immediate intrigue."},"cta":{"type":"both","text":"SHIRTS TODAY","placement":"end","style":"shop now"},"location":{"primary":"indoor_retail","setting_vibe":"minimalist studio"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["beige","blue"],"format":"talking_head"},"confidence":"high"}},{"ad_id":"1411528200238912","success_score":0.3196,"duration_days":37,"start_date":"2026-03-08","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1411528200238912","ad_copy":"Comment \"Link\" for outfit Link","analysis":{"hook":{"type":"both","style":"text overlay, product close-up","description":"An extreme close-up of the garment's unique zipper detail with a text overlay promising style versatility."},"cta":{"type":"verbal","text":"Comment \"Link\" for outfit Link","placement":"throughout","style":"engagement push"},"location":{"primary":"indoor_home","setting_vibe":"minimalist studio-at-home"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["white","blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"3839289606201801","success_score":0.316,"duration_days":35,"start_date":"2026-03-10","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=3839289606201801","ad_copy":"From the adjustable side straps to the tailored silhouette, @snitch.co.in black pants are made to fit right — all day.
+
+#snitchsquad #snitch #mensfashion","analysis":{"hook":{"type":"both","style":"bold statement","description":"A bold text overlay claiming 'The only pant you need' is shown over a centered full-body shot of the model."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_home","setting_vibe":"minimalist lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["black","cream"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"1329764955845569","success_score":0.3141,"duration_days":34,"start_date":"2026-03-11","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1329764955845569","ad_copy":"trouser by @snitch.co.in @thesnitchsquad 
+.
+.
+.
+.
+.
+( trousers beigetrousers snitchpants snitch outfit outfits fitcheck summerfit summeroutfit)
+#snitchbestseller #snitchsquad #explore #explorepage #summeroutfit","analysis":{"hook":{"type":"both","style":"text overlay","description":"Visual of a person walking in cream trousers through a nature setting paired with a mood-setting text overlay about a song."},"cta":{"type":"visual","text":"SNITCH","placement":"end","style":"brand awareness"},"location":{"primary":"outdoor_nature","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"calm","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["cream","green"],"format":"b_roll_lifestyle"},"confidence":"high"}},{"ad_id":"844427635277995","success_score":0.3141,"duration_days":34,"start_date":"2026-03-11","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=844427635277995","ad_copy":"Stop wearing basic outfits this Eid.
+
+Upgrade your fit with 100% linen this
+summer.
+
+Which one are you picking?
+
+@thesnitchsquad
+
+#SnitchBestSeller #SnitchSquad","analysis":{"hook":{"type":"both","style":"text overlay","description":"The video starts with a numerical countdown and a man in an olive shirt to immediately signal a listicle-style fashion guide."},"cta":{"type":"visual","text":"Light Pink, Beige, Black, Ice Blue","placement":"end","style":"choice-based engagement"},"location":{"primary":"indoor_home","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["pink","black"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"1810353666590849","success_score":0.3122,"duration_days":33,"start_date":"2026-03-12","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1810353666590849","ad_copy":"Comfort you feel. Fit they notice. @snitch.co.in","analysis":{"hook":{"type":"both","style":"bold statement","description":"A confessional-style talking head with a text overlay expressing an unexpected opinion about the brand."},"cta":{"type":"verbal","text":null,"placement":"end","style":"price value proposition"},"location":{"primary":"indoor_home","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["burgundy","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2799029550438733","success_score":0.3122,"duration_days":33,"start_date":"2026-03-12","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2799029550438733","ad_copy":"Not every festive outfit needs heavy embroidery.
+Sometimes clean, minimal linen does the job better. ✨
+.
+.
+.
+.#menswardrobeessentials #snitchsquad #Snitch #Mensfashion","analysis":{"hook":{"type":"both","style":"text overlay, product close-up","description":"A macro shot of the brand tag on a linen garment paired with a text overlay posing a question about clean festive looks."},"cta":{"type":"none","text":null,"placement":"none","style":null},"location":{"primary":"outdoor_urban","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"calm","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"chill","product_focus":"throughout","dominant_colors":["grey","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1304349731744595","success_score":0.3122,"duration_days":33,"start_date":"2026-03-12","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1304349731744595","ad_copy":"Bold prints, clean fit, zero effort.
+Statement banaane ke liye loud hona zaroori nahi hota. 🔥
+
+Wearing prints from Snitch that stand out — but still keep it classy.
+
+@snitch.co.in @thesnitchsquad 
+
+Shot by :- @imkrishnaog 
+Edit:- @harshit_21.02 
+
+#snitch #snitchsquad #bestseller #printedshirts #ad","analysis":{"hook":{"type":"visual","style":"action reveal","description":"The model is partially obscured by bright yellow flowers and green foliage, creating a depth-of-field reveal as the camera moves."},"cta":{"type":"visual","text":"SNITCH","placement":"end","style":"brand awareness"},"location":{"primary":"outdoor_nature","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["maroon","white","green"],"format":"b_roll_lifestyle"},"confidence":"high"}},{"ad_id":"2.17632E+15","success_score":0.3103,"duration_days":32,"start_date":"2026-03-13","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2176323656239160","ad_copy":"Spring loading… drip already here","analysis":{"hook":{"type":"both","style":"text overlay","description":"A stylish male model adjusts his collar against a textured dark background with a prominent brand logo overlay."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"outdoor_urban","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["grey","black"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"1414511636582834","success_score":0.3103,"duration_days":32,"start_date":"2026-03-13","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1414511636582834","ad_copy":"From Day Events to Night Vibes...
+ LINEN Never Fails 😎 
+
+#instagram #reels #snitch #snitchsquad #snitchbestseller","analysis":{"hook":{"type":"both","style":"text overlay","description":"A low-angle shot of the outfit with a yellow text overlay highlighting 'The Linen Outfit' for 'Multiple Moments'."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["green","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"915658841383635","success_score":0.3028,"duration_days":28,"start_date":"2026-03-17","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=915658841383635","ad_copy":"Spent the day at Snitch and it was a total fashion dream! From exploring their chic collection to finding pieces that speak my style, every moment was pure glam. ✨🖤","analysis":{"hook":{"type":"visual","style":"lifestyle scene","description":"Exterior branding and large billboard of the Snitch retail store to establish the location and brand identity."},"cta":{"type":"visual","text":"WEAR WHAT'S NEXT","placement":"end","style":"brand tagline"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"female","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["white","red","black"],"format":"storytelling"},"confidence":"high"}},{"ad_id":"1250241493864936","success_score":0.3028,"duration_days":28,"start_date":"2026-03-17","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1250241493864936","ad_copy":"Quick snitch stop and Sarath City, Hyderabad","analysis":{"hook":{"type":"both","style":"action reveal","description":"A creator walks toward a physical Snitch retail storefront with a location-based text overlay."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"modern retail store"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["grey","blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2314328249324389","success_score":0.3009,"duration_days":27,"start_date":"2026-03-18","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2314328249324389","ad_copy":"The new 9691 collection is here! Grab the limited edition now.","analysis":{"hook":{"type":"both","style":"text overlay, product close-up","description":"A single sneaker is centered against a large, bold yellow '969' graphic overlay on a white background."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_studio","setting_vibe":"minimalist studio"},"person":{"count":"none","gender_presentation":"none","age_range":"unclear","style_type":"none","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["white","yellow"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"839412039170552","success_score":0.299,"duration_days":26,"start_date":"2026-03-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=839412039170552","ad_copy":"Didn't plan to shop, but THIS made me stop\"
+
+\"If you're near 📍vaishali nagar Jaipur ✨you should walk in
+
+#snitchsquad #snitchoffline","analysis":{"hook":{"type":"visual","style":"lifestyle scene","description":"Establishment shot showing a creator descending the stairs of a modern, multi-story flagship storefront."},"cta":{"type":"visual","text":"#SNITCH","placement":"end","style":"branding reveal"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["black","white","grey"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1879433109357735","success_score":0.299,"duration_days":26,"start_date":"2026-03-19","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1879433109357735","ad_copy":"Stepped into SNITCH and walked out with a whole new vibe 🔥 Men’s fashion just hits different here!
+.
+.
+.
+.
+.
+.
+.
+#reelstrending #explore #foryou #viral #piyaparida","analysis":{"hook":{"type":"visual","style":"action reveal","description":"A woman is shown walking into the entrance of a Snitch physical retail store."},"cta":{"type":"none","text":null,"placement":"none","style":null},"location":{"primary":"indoor_retail","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"female","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["white","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"824975989884491","success_score":0.2971,"duration_days":25,"start_date":"2026-03-20","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=824975989884491","ad_copy":"Minimum effort. Maximum impact.
+Same shirt. Different level.
+#SNITCHTrousers
+
+#SnitchBestSeller #SnithSquad","analysis":{"hook":{"type":"both","style":"bold statement","description":"Creator addresses the camera directly with a text overlay claiming 'Effort low. Impact high.' to set up a style transformation."},"cta":{"type":"visual","text":"Minimum effort. Maximum impact. Let the trousers do the work SNITCH Trousers - Effortless Sharpness.","placement":"end","style":"product push"},"location":{"primary":"outdoor_urban","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["maroon","beige"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2437883883300704","success_score":0.2877,"duration_days":20,"start_date":"2026-03-25","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2437883883300704","ad_copy":"Day se night tak… same outfit, different vibe ✨
+#Snitch #LinenStyle #MensFashion #DayToNight”","analysis":{"hook":{"type":"visual","style":"action reveal","description":"The video opens with a clean lifestyle interior shot before the model enters the frame to reveal the outfit."},"cta":{"type":"visual","text":"SNITCH","placement":"end","style":"brand logo"},"location":{"primary":"indoor_home","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"neutral","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["blue","white","grey"],"format":"product_showcase"},"confidence":"high"}},{"ad_id":"1847167822795021","success_score":0.2877,"duration_days":20,"start_date":"2026-03-25","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1847167822795021","ad_copy":"If you’re nearby, this place is worth a quick visit.
+.
+Velachery Main Rd, Indira Gandhi Nagar, Velachery, Chennai, Tamil Nadu 600042
+.
+.
+#snitch #snitchsquad #creatorsprogram #tamilfashion #fashion 
+[ snitch, wear whats next, GRWM, drip, streetwear, spencer plaza, fashion, fit under budget, jaisonn, store visit, hard fit, fashion content]","analysis":{"hook":{"type":"visual","style":"action reveal","description":"The video opens with a wide shot of a person walking into a modern, brightly lit Snitch retail storefront."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"indoor_retail","setting_vibe":"modern retail"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["white","blue"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2111610186343768","success_score":0.2858,"duration_days":19,"start_date":"2026-03-26","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2111610186343768","ad_copy":"Found this store & honestly… worth it 🔥
+Premium fits, clean accessories & amazing perfumes everything on point 💯✨
+@snitch.co.in @thesnitchsquad
+
+📍 Snitch Store
+FF-31, 1st Floor, Panchpakhadi, Eastern Express Highway, Thane West
+If you’re nearby, don’t miss this 👀🛍️ 
+
+#snitch #mensfashion #dhurandhar #trendingaudio #fypppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp","analysis":{"hook":{"type":"visual","style":"lifestyle scene","description":"A man in a black turban and shirt stands in front of a brightly lit Snitch retail storefront in a modern shopping mall."},"cta":{"type":"visual","text":"Must Visit !!","placement":"end","style":"urgency push"},"location":{"primary":"indoor_retail","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["black","teal"],"format":"mixed"},"confidence":"high"}},{"ad_id":"4339947306245818","success_score":0.2764,"duration_days":14,"start_date":"2026-03-31","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=4339947306245818","ad_copy":"Not your regular striped shirt 👀❤️🔥
+Premium look... Premium Comfort !
+#Snitch #SnitchSquad #MensFashion
+#stripedstyle","analysis":{"hook":{"type":"both","style":"bold statement","description":"An overlay text 'Stop wearing boring shirts...' with a red cross icon is used over a casual lifestyle shot to provoke the viewer."},"cta":{"type":"visual","text":"Switch To Smart Casual ✅","placement":"end","style":"swipe up"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["pink","rust"],"format":"mixed"},"confidence":"high"}},{"ad_id":"4415642815429245","success_score":0.2745,"duration_days":13,"start_date":"2026-04-01","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=4415642815429245","ad_copy":"LEGACY by @snitch.co.in
+Not just a collection but a statement that carries forward.
+
+#snitch #LegacyBySnitch #StatementStyle","analysis":{"hook":{"type":"visual","style":"action reveal","description":"A first-person perspective shot of a hand selecting a specific garment from a wooden wardrobe."},"cta":{"type":"none","text":null,"placement":"none","style":"none"},"location":{"primary":"mixed","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"calm","skin_tone_diversity":false},"content":{"pacing":"fast_cuts","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["navy blue","earth tones"],"format":"mixed"},"confidence":"high"}},{"ad_id":"933678842997687","success_score":0.2726,"duration_days":12,"start_date":"2026-04-02","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=933678842997687","ad_copy":"Let's do timer challenge today in snitch store ⏱️","analysis":{"hook":{"type":"both","style":"action reveal","description":"A creator stands in front of a Snitch store entrance with a text overlay announcing a challenge to build an outfit from scratch."},"cta":{"type":"none","text":null,"placement":"none","style":null},"location":{"primary":"indoor_retail","setting_vibe":"modern minimalist retail"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["maroon","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1450900323482578","success_score":0.267,"duration_days":9,"start_date":"2026-04-05","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=1450900323482578","ad_copy":"Amazing Knitted Shirts by Snitch!👕
+Check it now!!
+
+#fashion #men #new #snitch #summer","analysis":{"hook":{"type":"both","style":"text overlay","description":"A rapid reveal of two packaged shirts with 'I got this' text overlays to signal a haul or purchase."},"cta":{"type":"none","text":null,"placement":"none","style":"shop now"},"location":{"primary":"mixed","setting_vibe":"everyday casual"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"ugc_authentic","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["white","black"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2671782063192239","success_score":0.2613,"duration_days":6,"start_date":"2026-04-08","end_date":"2026-04-14","ad_library_url":"https://www.facebook.com/ads/library/?id=2671782063192239","ad_copy":"It’s the linen season! 
+
+Dm or comment for outfit links!","analysis":{"hook":{"type":"both","style":"text overlay","description":"A tight close-up of a mint green linen shirt with a text overlay stating 'You discovered linen and never went back!'"},"cta":{"type":"both","text":"Dm or comment for outfit links!","placement":"throughout","style":"engagement push"},"location":{"primary":"outdoor_urban","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"neutral","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["mint green","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"2892605570910111","success_score":0.2368,"duration_days":9,"start_date":"2026-03-29","end_date":"2026-04-07","ad_library_url":"https://www.facebook.com/ads/library/?id=2892605570910111","ad_copy":"Get the best summer outfits only at Snitch.com! Visit the nearest stores noe","analysis":{"hook":{"type":"both","style":"text overlay","description":"A behind-the-scenes shot of a professional production set with a text overlay claiming the brand pays attention to details."},"cta":{"type":"visual","text":"WEAR WHAT'S NEXT","placement":"end","style":"shop now"},"location":{"primary":"indoor_studio","setting_vibe":"aspirational lifestyle"},"person":{"count":"duo","gender_presentation":"male","age_range":"20s","style_type":"model_aspirational","energy":"calm","skin_tone_diversity":true},"content":{"pacing":"moderate","text_overlays":true,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["navy","white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"4.49925E+15","success_score":0.0603,"duration_days":32,"start_date":"2026-01-14","end_date":"2026-02-15","ad_library_url":"https://www.facebook.com/ads/library/?id=4499249826970610","ad_copy":"Snitch — India’s home-grown brand.
+Built for the modern Indian wardrobe.
+Fresh drops. Sharp fits. Everyday style.
+Shop now.","analysis":{"hook":{"type":"both","style":"bold statement","description":"A male creator speaks directly and emphatically to the camera with expressive hand gestures to capture immediate attention."},"cta":{"type":"visual","text":"WEAR WHAT'S NEXT","placement":"end","style":"brand tagline"},"location":{"primary":"indoor_home","setting_vibe":"aspirational lifestyle"},"person":{"count":"solo","gender_presentation":"male","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":false},"content":{"pacing":"moderate","text_overlays":false,"music_vibe":"trending_audio","product_focus":"throughout","dominant_colors":["black","dark green","off-white"],"format":"mixed"},"confidence":"high"}},{"ad_id":"1423861759131503","success_score":0.0509,"duration_days":27,"start_date":"2026-01-19","end_date":"2026-02-15","ad_library_url":"https://www.facebook.com/ads/library/?id=1423861759131503","ad_copy":"Looking for shirts for this festive season? We got you covered!! 
+Shop your favourites: https://www.snitch.com/men-shirts/buy
+.
+.
+.
+.
+.
+(Shirts, pongal fits, printed shirts, pongal looks, shirts for men)","analysis":{"hook":{"type":"both","style":"bold statement","description":"A presenter in a branded SNITCH t-shirt speaks directly to the camera with high energy to establish immediate brand authority."},"cta":{"type":"visual","text":"WEAR WHAT'S NEXT","placement":"end","style":"brand tagline"},"location":{"primary":"indoor_studio","setting_vibe":"minimalist studio"},"person":{"count":"solo","gender_presentation":"female","age_range":"20s","style_type":"influencer","energy":"high_energy","skin_tone_diversity":true},"content":{"pacing":"fast_cuts","text_overlays":true,"music_vibe":"hype","product_focus":"throughout","dominant_colors":["black","yellow"],"format":"mixed"},"confidence":"high"}}];
+
+// ── HELPERS ─────────────────────────────────────────────────
+function median(arr) {
+  if (!arr.length) return 0;
+  const s = [...arr].sort((a,b)=>a-b);
+  const m = Math.floor(s.length/2);
+  return s.length%2 ? s[m] : (s[m-1]+s[m])/2;
+}
+
+const COLOR_MAP = {
+  pink:'#f9a8c9',blue:'#6097f8',white:'#f5f5f5',beige:'#d9c9a8',
+  black:'#222',green:'#4db87a',mustard:'#e6a817',brown:'#8b5e3c',
+  mauve:'#c09090',peach:'#ffb38a',grey:'#9e9e9e',gray:'#9e9e9e',
+  red:'#e05252',maroon:'#8b1a1a',burgundy:'#7a1c2e','warm beige':'#d4b896',
+  navy:'#1a2b4a','navy blue':'#1a2b4a','light blue':'#90bde0',
+  'olive green':'#6b7c2b','off white':'#f0ede6',cream:'#f7f0e0',
+  tan:'#c4a882',teal:'#2a9d8f',rust:'#b7420e',yellow:'#f5c842',
+  orange:'#f08c34',purple:'#9b59b6','earth tones':'#a0785a',
+  '#1d3a5a':'#1d3a5a','#d2b48c':'#d2b48c'
+};
+
+function colorHex(c) {
+  if (!c) return '#bbb';
+  if (c.startsWith('#')) return c;
+  return COLOR_MAP[c.toLowerCase()] || '#aaa';
+}
+
+function scoreColor(s) {
+  if (s >= 0.8) return '#059669';
+  if (s >= 0.6) return '#c08000';
+  return '#e11d48';
+}
+
+// ── STATS ───────────────────────────────────────────────────
+function renderStats() {
+  const total    = ADS.length;
+  const errors   = ADS.filter(d=>d.analysis?.error).length;
+  const analysed = total - errors;
+  const medDur   = median(ADS.map(d=>d.duration_days));
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-avg').textContent   = analysed;
+  document.getElementById('stat-dur').textContent   = medDur + 'd';
+  document.getElementById('stat-err').textContent   = errors + ' (' + Math.round(errors/total*100) + '%)';
+}
+
+// ── INSIGHTS ─────────────────────────────────────────────────
+const INSIGHT_DIMS = [
+  { label:'Hook Type',     keyFn: d => d.analysis?.hook?.type },
+  { label:'Hook Style',    keyFn: d => { const s = d.analysis?.hook?.style; return s ? s.split(',')[0].trim() : null; } },
+  { label:'CTA Style',     keyFn: d => { const s = d.analysis?.cta?.style; return (s && s!=='none') ? s : null; } },
+  { label:'Location',      keyFn: d => d.analysis?.location?.primary },
+  { label:'Person Style',  keyFn: d => { const s = d.analysis?.person?.style_type; return (s && s!=='none') ? s : null; } },
+  { label:'Format',        keyFn: d => d.analysis?.content?.format },
+  { label:'Pacing',        keyFn: d => d.analysis?.content?.pacing },
+  { label:'Energy',        keyFn: d => { const e = d.analysis?.person?.energy; return (e && e!=='none') ? e : null; } },
+];
+
+function renderInsights() {
+  const analysed = ADS.filter(d => d.analysis && !d.analysis.error);
+  const grid = document.getElementById('insightsGrid');
+
+  grid.innerHTML = INSIGHT_DIMS.map(dim => {
+    const groups = {};
+    analysed.forEach(d => {
+      const k = dim.keyFn(d);
+      if (k && k !== 'null' && k !== 'unclear' && k !== 'none') {
+        if (!groups[k]) groups[k] = { durs: [], scores: [] };
+        groups[k].durs.push(d.duration_days);
+        groups[k].scores.push(d.success_score);
+      }
+    });
+
+    const entries = Object.entries(groups)
+      .map(([key, {durs, scores}]) => ({
+        key,
+        median: median(durs),
+        medianScore: median(scores),
+        count: durs.length
+      }))
+      .filter(e => e.count >= 1)
+      .sort((a,b) => b.median - a.median)
+      .slice(0, 4);
+
+    const maxMed = entries[0]?.median || 1;
+
+    const rows = entries.map(e => `
+      <div class="insight-row">
+        <div class="insight-row-inner">
+          <div class="insight-key">${e.key}</div>
+          <div class="insight-bar-wrap">
+            <div class="insight-bar" style="width:${Math.round(e.median/maxMed*100)}%"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          <div class="insight-val">${Math.round(e.median)}d</div>
+          <div class="insight-count">n=${e.count}</div>
+          <div class="insight-count" style="color:var(--accent)">score ${e.medianScore.toFixed(2)}</div>
+        </div>
+      </div>`).join('');
+
+    return `<div class="insight-card">
+      <div class="insight-dim-label">${dim.label}</div>
+      <div class="insight-rows">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RING ─────────────────────────────────────────────────────
+function makeRing(score) {
+  const r = 20, cx=26, cy=26, circ=2*Math.PI*r;
+  const offset = circ*(1-score);
+  const col = scoreColor(score);
+  return `<div class="score-ring">
+    <svg viewBox="0 0 52 52">
+      <circle class="track" cx="${cx}" cy="${cy}" r="${r}"/>
+      <circle class="fill" cx="${cx}" cy="${cy}" r="${r}"
+        stroke="${col}" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"/>
+    </svg>
+    <div class="label">
+      <span class="num" style="color:${col}">${Math.round(score*100)}</span>
+      <span class="pct">%</span>
+    </div>
+  </div>`;
+}
+
+function chip(val, hl=false) {
+  if (!val || val==='none' || val==='null') return '';
+  return `<span class="chip${hl?' highlight':''}">${val}</span>`;
+}
+
+function renderAnalysis(a) {
+  if (!a || a.error) return '';
+  const colors = (a.content?.dominant_colors||[]).map(c=>{
+    const hex = colorHex(c);
+    return `<span class="color-swatch" style="background:${hex}" title="${c}"></span><span class="color-label">${c}</span>`;
+  }).join('');
+
+  return `
+    <div class="analysis-group">
+      <div class="analysis-group-label">Hook</div>
+      <div class="chips">${chip(a.hook?.type,true)}${chip(a.hook?.style)}</div>
+      ${a.hook?.description ? `<div class="description-text">${a.hook.description}</div>` : ''}
+    </div>
+    <div class="analysis-group">
+      <div class="analysis-group-label">CTA</div>
+      <div class="chips">${chip(a.cta?.text,true)}${chip(a.cta?.style)}${a.cta?.placement&&a.cta.placement!=='none'?chip('placed: '+a.cta.placement):''}</div>
+    </div>
+    <div class="analysis-group">
+      <div class="analysis-group-label">Person</div>
+      <div class="chips">
+        ${chip(a.person?.style_type,true)}${chip(a.person?.energy)}${chip(a.person?.count)}${chip(a.person?.age_range)}
+        <span class="chip ${a.person?.skin_tone_diversity?'bool-true':'bool-false'}" style="background:transparent;border:none;padding:0">
+          ${a.person?.skin_tone_diversity?'✓ diverse skin tones':'✗ not diverse'}
+        </span>
+      </div>
+    </div>
+    <div class="analysis-group">
+      <div class="analysis-group-label">Content</div>
+      <div class="chips">${chip(a.content?.format,true)}${chip(a.content?.pacing)}${chip(a.content?.music_vibe)}${chip(a.content?.text_overlays?'text overlays':'no overlays')}</div>
+    </div>
+    <div class="analysis-group">
+      <div class="analysis-group-label">Location</div>
+      <div class="chips">${chip(a.location?.primary,true)}${chip(a.location?.setting_vibe)}</div>
+    </div>
+    ${colors?`<div class="analysis-group">
+      <div class="analysis-group-label">Dominant Colors</div>
+      <div class="color-swatch-row">${colors}</div>
+    </div>`:''}`;
+}
+
+function renderCard(ad, idx) {
+  const hasError    = ad.analysis?.error;
+  const hasAnalysis = ad.analysis && !ad.analysis.error;
+  const conf        = hasAnalysis ? ad.analysis.confidence : null;
+
+  return `<div class="card">
+    <div class="card-head">
+      ${makeRing(ad.success_score)}
+      <div class="card-meta">
+        <a class="card-id" href="${ad.ad_library_url}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;"># ${ad.ad_id} ↗</a>
+        <div class="card-badges">
+          <span class="badge badge-dur">${ad.duration_days}d</span>
+          ${hasError ? '<span class="badge badge-err">no analysis</span>' : ''}
+          ${conf ? `<span class="badge badge-conf">${conf}</span>` : ''}
+        </div>
+        <div class="card-dates">${ad.start_date} → ${ad.end_date}</div>
+      </div>
+    </div>
+
+    <div class="card-copy">
+      <div class="copy-text" id="copy-${idx}">${ad.ad_copy||'—'}</div>
+      ${ad.ad_copy&&ad.ad_copy.length>120
+        ?`<button class="copy-toggle" onclick="toggleCopy(${idx})">show more ↓</button>`:''}
+    </div>
+
+    <a class="card-link" href="${ad.ad_library_url}" target="_blank" rel="noopener">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+      View on Facebook Ad Library
+    </a>
+
+    ${hasAnalysis ? `
+    <button class="analysis-toggle" id="toggle-${idx}" onclick="toggleAnalysis(${idx})">
+      <span>Analysis Details</span>
+      <svg class="arrow" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="analysis-body" id="body-${idx}">
+      ${renderAnalysis(ad.analysis)}
+    </div>` : ''}
+
+    ${hasError ? `<div class="error-box"><p>⚠ Analysis unavailable — Gemini API error during processing</p></div>` : ''}
+  </div>`;
+}
+
+function toggleCopy(idx) {
+  const el = document.getElementById('copy-'+idx);
+  const btn = el.nextElementSibling;
+  if (!btn) return;
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? 'show less ↑' : 'show more ↓';
+}
+
+function toggleAnalysis(idx) {
+  document.getElementById('toggle-'+idx).classList.toggle('open');
+  document.getElementById('body-'+idx).classList.toggle('open');
+}
+
+function getFiltered() {
+  const hookType  = document.getElementById('fHookType').value;
+  const styleType = document.getElementById('fStyleType').value;
+  const format    = document.getElementById('fFormat').value;
+  const errMode   = document.getElementById('fError').value;
+  const sortMode  = document.getElementById('fSort').value;
+
+  let data = [...ADS];
+  if (errMode === 'ok')  data = data.filter(d => !d.analysis?.error);
+  if (errMode === 'err') data = data.filter(d =>  d.analysis?.error);
+  if (hookType)  data = data.filter(d => d.analysis?.hook?.type === hookType);
+  if (styleType) data = data.filter(d => d.analysis?.person?.style_type === styleType);
+  if (format)    data = data.filter(d => d.analysis?.content?.format === format);
+
+  data.sort((a,b) => {
+    if (sortMode==='score_desc') return b.success_score - a.success_score;
+    if (sortMode==='score_asc')  return a.success_score - b.success_score;
+    if (sortMode==='dur_desc')   return b.duration_days - a.duration_days;
+    if (sortMode==='dur_asc')    return a.duration_days - b.duration_days;
+    return 0;
+  });
+  return data;
+}
+
+function render() {
+  const data = getFiltered();
+  document.getElementById('countShown').textContent = data.length;
+  document.getElementById('countTotal').textContent = ADS.length;
+  const grid = document.getElementById('grid');
+  if (!data.length) { grid.innerHTML = '<div class="no-results">No ads match the current filters</div>'; return; }
+  grid.innerHTML = data.map((ad,i) => renderCard(ad, i)).join('');
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+renderStats();
+renderInsights();
+render();
+document.querySelectorAll('select').forEach(s => s.addEventListener('change', render));
+document.getElementById('headerDate').textContent =
+  'Generated · ' + new Date().toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'});
+</script>
+</body>
+</html>
